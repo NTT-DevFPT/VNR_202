@@ -2,8 +2,8 @@
   "name": "r3f-vite-starter",
   "private": true,
   "version": "1.0.0",
+  "description": "VNR_202",
   "type": "module",
-  "homepage": "https://not-for-tomorrow.github.io/VNR202/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
