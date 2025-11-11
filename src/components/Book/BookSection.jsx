@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, forwardRef, useRef } from "react";
+import React, { Suspense, useEffect, forwardRef, useRef, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Loader, Html, useTexture } from "@react-three/drei";
 import { Experience } from "./Experience";
@@ -6,20 +6,89 @@ import { UI } from "./UI";
 import { useAtom } from "jotai";
 import { BOOK_LIBRARY, currentBookAtom } from "../../state/library";
 import { Book } from "./Book";
+import { preloadTextureWithFallback } from "../../utils/textureCache";
+import { SRGBColorSpace } from "three";
 
 // dùng forwardRef để truyền ref từ App xuống Book
 const BookSection = forwardRef((props, ref) => {
   const [bookIndex] = useAtom(currentBookAtom);
-  const pages = BOOK_LIBRARY[bookIndex].pages;
+  const currentBook = useMemo(() => BOOK_LIBRARY[bookIndex], [bookIndex]);
+  const pages = useMemo(() => currentBook.pages, [currentBook]);
 
+  // Preload cover texture ngay khi bookIndex thay đổi
+  useEffect(() => {
+    if (currentBook?.notebookFolder && currentBook?.coverTexture) {
+      const texturePath = `textures/${currentBook.notebookFolder}/${currentBook.coverTexture}`;
+      preloadTextureWithFallback(texturePath, { colorSpace: SRGBColorSpace });
+    }
+
+    // Preload bookmark textures
+    if (currentBook?.bookmark?.folder) {
+      const bookmark = currentBook.bookmark;
+      if (bookmark.front) {
+        preloadTextureWithFallback(`textures/${bookmark.folder}/${bookmark.front}`, {
+          colorSpace: SRGBColorSpace,
+          flipY: true
+        });
+      }
+      if (bookmark.back) {
+        preloadTextureWithFallback(`textures/${bookmark.folder}/${bookmark.back}`, {
+          colorSpace: SRGBColorSpace,
+          flipY: true
+        });
+      }
+    }
+  }, [currentBook]);
+
+  // Preload page textures
   useEffect(() => {
     pages.forEach((p) => {
-      useTexture.preload(`textures/${p.front}.jpg`);
-      useTexture.preload(`textures/${p.back}.jpg`);
+      try {
+        useTexture.preload(`textures/${p.front}.jpg`);
+        useTexture.preload(`textures/${p.back}.jpg`);
+      } catch (e) {
+        // Ignore
+      }
     });
-    useTexture.preload(`textures/book-cover-roughness.jpg`);
-    useTexture.preload(`textures/ruled-paper.jpg`);
+    try {
+      useTexture.preload(`textures/book-cover-roughness.jpg`);
+      useTexture.preload(`textures/ruled-paper.jpg`);
+    } catch (e) {
+      // Ignore
+    }
   }, [pages]);
+
+  // Preload textures của notebook tiếp theo trong background
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      const nextBookIndex = (bookIndex + 1) % BOOK_LIBRARY.length;
+      const nextBook = BOOK_LIBRARY[nextBookIndex];
+      
+      if (nextBook?.notebookFolder && nextBook?.coverTexture) {
+        preloadTextureWithFallback(`textures/${nextBook.notebookFolder}/${nextBook.coverTexture}`, {
+          colorSpace: SRGBColorSpace
+        });
+      }
+
+      if (nextBook?.bookmark?.folder) {
+        const bookmark = nextBook.bookmark;
+        if (bookmark.front) {
+          preloadTextureWithFallback(`textures/${bookmark.folder}/${bookmark.front}`, {
+            colorSpace: SRGBColorSpace,
+            flipY: true
+          });
+        }
+        if (bookmark.back) {
+          preloadTextureWithFallback(`textures/${bookmark.folder}/${bookmark.back}`, {
+            colorSpace: SRGBColorSpace,
+            flipY: true
+          });
+        }
+      }
+    }, 1000); // Delay 1s để không block current loading
+
+    return () => clearTimeout(timeoutId);
+  }, [bookIndex]);
 
   return (
     <section

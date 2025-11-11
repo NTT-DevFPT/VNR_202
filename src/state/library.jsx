@@ -39,6 +39,7 @@ export const BOOK_LIBRARY = [
     title: "Đông Kinh Nghĩa Thục",
     notebookFolder: "notebook1",
     coverTexture: "HD_DongKinhNghiaThuc_Cover",
+    backCoverColor: "#9B7F57", // Màu nâu vàng ấm (giáo dục, văn hóa)
     bookmarkFront: "HD_DongKinhNghiaThuc_BM_Front",
     bookmarkBack: "HD_DongKinhNghiaThuc_BM_Back",
     pages: buildNotebookPages({
@@ -63,6 +64,7 @@ export const BOOK_LIBRARY = [
     title: "Khởi nghĩa Yên Thế",
     notebookFolder: "notebook2",
     coverTexture: "KN_YenThe_Cover",
+    backCoverColor: "#3D5A3D", // Màu xanh lá rừng đậm (rừng núi Yên Thế)
     bookmarkFront: "KN_YenThe_BM_Front",
     bookmarkBack: "KN_YenThe_BM_Back",
     pages: buildNotebookPages({
@@ -87,6 +89,7 @@ export const BOOK_LIBRARY = [
     title: "Phong trào Cần Vương",
     notebookFolder: "notebook3",
     coverTexture: "PT_CanVuong_Cover",
+    backCoverColor: "#f4d35c", // Màu đỏ nâu đậm (lòng yêu nước, chiến đấu)
     bookmarkFront: "PT_CanVuong_BM_Front",
     bookmarkBack: "PT_CanVuong_BM_Back",
     pages: buildNotebookPages({
@@ -111,6 +114,7 @@ export const BOOK_LIBRARY = [
     title: "Phong trào Đông Du",
     notebookFolder: "notebook4",
     coverTexture: "PT_DongDu_Cover",
+    backCoverColor: "#1E3A5B", // Màu xanh dương đậm (biển cả, hành trình Đông Du)
     bookmarkFront: "PT_DongDu_BM_Front",
     bookmarkBack: "PT_DongDu_BM_Back",
     pages: buildNotebookPages({
@@ -135,6 +139,7 @@ export const BOOK_LIBRARY = [
     title: "Phong trào Duy Tân",
     notebookFolder: "notebook5",
     coverTexture: "PT_DuyTan_Cover",
+    backCoverColor: "#1E3A5B", // Màu vàng nâu ấm (cải cách, đổi mới)
     bookmarkFront: "PT_DuyTan_BM_Front",
     bookmarkBack: "PT_DuyTan_BM_Back",
     pages: buildNotebookPages({
@@ -156,43 +161,45 @@ export const BOOK_LIBRARY = [
   },
   {
     id: "notebook-06",
-    title: "Phong trào Duy Tân",
+    title: "Phong trào Chống Thuế Trung Kỳ",
     notebookFolder: "notebook6",
-    coverTexture: "PT_DuyTan_Cover",
-    bookmarkFront: "PT_DuyTan_BM_Front",
-    bookmarkBack: "PT_DuyTan_BM_Back",
+    coverTexture: "PT_ChongThueTrungKi_Cover",
+    backCoverColor: "#e8e3e3", // Màu nâu sẫm (đất, nông dân)
+    bookmarkFront: "PT_ChongThueTrungKi_BM_Front",
+    bookmarkBack: "PT_ChongThueTrungKi_BM_Cover", // Dùng Cover thay Back vì không có Back
     pages: buildNotebookPages({
       innerRuledCount: 10,
       ruledTexture: "ruled-paper",
     }),
     bookmark: { 
-      front: "PT_DuyTan_BM_Front", 
-      back: "PT_DuyTan_BM_Back",
+      front: "PT_ChongThueTrungKi_BM_Front", 
+      back: "PT_ChongThueTrungKi_BM_Cover",
       folder: "notebook6"
     },
     story: {
-      title: "Phong trào Duy Tân",
+      title: "Phong trào Chống Thuế Trung Kỳ",
       paragraphs: [
-        "Phong trào Duy Tân là phong trào cải cách văn hóa, giáo dục và xã hội đầu thế kỷ 20.",
-        "Tài liệu về những cải cách và đổi mới tư duy của thời kỳ này.",
+        "Phong trào Chống Thuế Trung Kỳ là phong trào đấu tranh của nông dân chống lại sưu cao thuế nặng.",
+        "Tài liệu về tinh thần đấu tranh và khí phách của người dân Trung Kỳ.",
       ],
     },
   },
   {
     id: "notebook-07",
     title: "Khởi nghĩa Bãi Sậy",
-    notebookFolder: "notrbook7",
-    coverTexture: "PT_DuyTan_Cover",
-    bookmarkFront: "PT_DuyTan_BM_Front",
-    bookmarkBack: "PT_DuyTan_BM_Back",
+    notebookFolder: "notebook7",
+    coverTexture: "PT_VoSanHoa_Cover",
+    backCoverColor: "#df1b1b", // Màu xanh lá đậm (đồng bằng, lau sậy)
+    bookmarkFront: "PT_VoSanHoa_BM_Front",
+    bookmarkBack: "PT_VoSanHoa_BM_Back",
     pages: buildNotebookPages({
       innerRuledCount: 10,
       ruledTexture: "ruled-paper",
     }),
     bookmark: { 
-      front: "PT_DuyTan_BM_Front", 
-      back: "PT_DuyTan_BM_Back",
-      folder: "notrbook7"
+      front: "PT_VoSanHoa_BM_Front", 
+      back: "PT_VoSanHoa_BM_Back",
+      folder: "notebook7"
     },
     story: {
       title: "Khởi nghĩa Bãi Sậy",
@@ -204,72 +211,75 @@ export const BOOK_LIBRARY = [
   },
   {
     id: "notebook-08",
-    title: "Phong trào Đông Kinh",
+    title: "Khởi nghĩa Thái Nguyên",
     notebookFolder: "notebook8",
-    coverTexture: "PT_DuyTan_Cover",
-    bookmarkFront: "PT_DuyTan_BM_Front",
-    bookmarkBack: "PT_DuyTan_BM_Back",
+    coverTexture: "KN_ThaiNguyen_Cover",
+    backCoverColor: "#df2020", // Màu nâu vàng đậm (rừng núi, khởi nghĩa)
+    bookmarkFront: "KN_ThaiNguyen_BM_Front",
+    bookmarkBack: "KN_ThaiNguyen_BM_Back",
     pages: buildNotebookPages({
       innerRuledCount: 10,
       ruledTexture: "ruled-paper",
     }),
     bookmark: { 
-      front: "PT_DuyTan_BM_Front", 
-      back: "PT_DuyTan_BM_Back",
+      front: "KN_ThaiNguyen_BM_Front", 
+      back: "KN_ThaiNguyen_BM_Back",
       folder: "notebook8"
     },
     story: {
-      title: "Phong trào Đông Kinh",
+      title: "Khởi nghĩa Thái Nguyên",
       paragraphs: [
-        "Phong trào Đông Kinh ghi lại những hoạt động văn hóa và giáo dục.",
-        "Những đóng góp quan trọng cho sự phát triển của xã hội Việt Nam.",
+        "Khởi nghĩa Thái Nguyên là một cuộc khởi nghĩa quan trọng chống thực dân Pháp.",
+        "Ghi lại tinh thần đấu tranh và những chiến công của nghĩa quân Thái Nguyên.",
       ],
     },
   },
   {
     id: "notebook-09",
-    title: "Phong trào Văn Thân",
+    title: "Phan Châu Trinh",
     notebookFolder: "notebook9",
-    coverTexture: "PT_DuyTan_Cover",
-    bookmarkFront: "PT_DuyTan_BM_Front",
-    bookmarkBack: "PT_DuyTan_BM_Back",
+    coverTexture: "PhanChauTrinh_Cover",
+    backCoverColor: "#FFFFFF", // Màu nâu xám (văn học, trí thức)
+    bookmarkFront: "PhanChauTrinh_BM_Front",
+    bookmarkBack: "PhanChauTrinh_BM_Back",
     pages: buildNotebookPages({
       innerRuledCount: 10,
       ruledTexture: "ruled-paper",
     }),
     bookmark: { 
-      front: "PT_DuyTan_BM_Front", 
-      back: "PT_DuyTan_BM_Back",
+      front: "PhanChauTrinh_BM_Front", 
+      back: "PhanChauTrinh_BM_Back",
       folder: "notebook9"
     },
     story: {
-      title: "Phong trào Văn Thân",
+      title: "Phan Châu Trinh",
       paragraphs: [
-        "Phong trào Văn Thân là phong trào yêu nước của giới trí thức.",
-        "Tài liệu về những hoạt động và tư tưởng của các văn thân.",
+        "Phan Châu Trinh là nhà cách mạng, nhà văn hóa lớn của Việt Nam đầu thế kỷ 20.",
+        "Tài liệu về cuộc đời và sự nghiệp đấu tranh vì dân tộc của Phan Châu Trinh.",
       ],
     },
   },
   {
     id: "notebook-10",
-    title: "Phong trào Dân Chủ",
+    title: "Phong trào Án Xá Phan Bội Châu",
     notebookFolder: "notebook10",
-    coverTexture: "PT_DuyTan_Cover",
-    bookmarkFront: "PT_DuyTan_BM_Front",
-    bookmarkBack: "PT_DuyTan_BM_Back",
+    coverTexture: "PT_AnXaPBC_Cover",
+    backCoverColor: "#e8cb88", // Màu xanh dương xám (tự do, cách mạng)
+    bookmarkFront: "PT_AnXaPBC_BM_front", // Chú ý: file thực tế là "front" (chữ thường)
+    bookmarkBack: "PT_AnXaPBC_BM_Back",
     pages: buildNotebookPages({
       innerRuledCount: 10,
       ruledTexture: "ruled-paper",
     }),
     bookmark: { 
-      front: "PT_DuyTan_BM_Front", 
-      back: "PT_DuyTan_BM_Back",
+      front: "PT_AnXaPBC_BM_front", // Chú ý: file thực tế là "front" (chữ thường)
+      back: "PT_AnXaPBC_BM_Back",
       folder: "notebook10"
     },
     story: {
-      title: "Phong trào Dân Chủ",
+      title: "Phong trào Án Xá Phan Bội Châu",
       paragraphs: [
-        "Phong trào Dân Chủ đấu tranh cho quyền tự do và độc lập dân tộc.",
+        "Phong trào Án Xá Phan Bội Châu là phong trào đấu tranh đòi thả Phan Bội Châu.",
         "Tổng kết hành trình đấu tranh và những bài học quý giá từ lịch sử.",
       ],
     },

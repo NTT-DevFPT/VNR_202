@@ -2,7 +2,7 @@ import { useCursor, useTexture, Text } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useAtom } from "jotai";
 import { easing } from "maath";
-import { useEffect, useMemo, useRef, useState,  forwardRef  } from "react";
+import { useEffect, useMemo, useRef, useState,  forwardRef, useCallback  } from "react";
 import {
   Bone,
   BoxGeometry,
@@ -22,6 +22,7 @@ import {
 } from "three";
 import { degToRad } from "three/src/math/MathUtils.js";
 import { BOOK_LIBRARY, currentBookAtom, bookPageAtom } from "../../state/library";
+import { loadTextureWithFallback, preloadTextureWithFallback } from "../../utils/textureCache";
 
 // Suppress 404 errors for texture loading in console
 if (typeof window !== 'undefined' && !window.__textureErrorSuppressed) {
@@ -130,59 +131,44 @@ const Page = ({
   pagesLength = 0,
   notebookFolder,
   coverTexture,
+  backCoverColor,
   ...props
 }) => {
-  // Load texture - sử dụng TextureLoader cho cover để tránh hooks issues
+  // Load texture - sử dụng texture cache để tối ưu performance
   const [coverTextureLoaded, setCoverTextureLoaded] = useState(null);
   
   // Load cover texture từ notebook folder nếu là cover
-  // File thực tế là PNG, nên ưu tiên PNG trước
+  // Sử dụng texture cache để tránh load lại
   useEffect(() => {
     if (!isCover || !notebookFolder || !coverTexture) {
       setCoverTextureLoaded(null);
       return;
     }
 
-    const loader = new TextureLoader();
     let cancelled = false;
+    const texturePath = `textures/${notebookFolder}/${coverTexture}`;
 
-    // Thử load PNG trước (file thực tế)
-    loader.load(
-      `textures/${notebookFolder}/${coverTexture}.png`,
-      (texture) => {
-        if (cancelled) return;
-        texture.colorSpace = SRGBColorSpace;
-        setCoverTextureLoaded(texture);
-      },
-      undefined,
-      () => {
-        // PNG failed, try JPG
-        if (cancelled) return;
-        loader.load(
-          `textures/${notebookFolder}/${coverTexture}.jpg`,
-          (texture) => {
-            if (cancelled) return;
-            texture.colorSpace = SRGBColorSpace;
-            setCoverTextureLoaded(texture);
-          },
-          undefined,
-          () => {
-            // Both failed, set to null
-            if (cancelled) return;
-            setCoverTextureLoaded(null);
-          }
-        );
-      }
-    );
+    // Load texture với cache và fallback
+    loadTextureWithFallback(texturePath, { colorSpace: SRGBColorSpace })
+      .then((texture) => {
+        if (!cancelled) {
+          setCoverTextureLoaded(texture);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setCoverTextureLoaded(null);
+        }
+      });
 
     return () => {
       cancelled = true;
     };
   }, [isCover, notebookFolder, coverTexture]);
 
-  // Chọn texture nào dùng: cover texture nếu có, nếu không thì null (sẽ dùng màu trong materials)
-  const textures = coverTextureLoaded && isCover
-    ? { front: coverTextureLoaded, back: coverTextureLoaded }
+  // Chọn texture nào dùng: cover texture chỉ cho front cover, back cover dùng màu nền
+  const textures = coverTextureLoaded && isCover && number === 0
+    ? { front: coverTextureLoaded, back: null }
     : null;
 
   const group = useRef();
@@ -252,20 +238,15 @@ const Page = ({
         });
 
     const backMaterial = isCover && number === pagesLength - 1
-      ? (textures && textures.back
-        ? new MeshStandardMaterial({
-            map: textures.back,
-            emissive: emissiveColor,
-            emissiveIntensity: 0,
-          })
-        : new MeshStandardMaterial({
-            color: "#000000", // Matte black cho back cover nếu không có texture
-            roughness: 0.9,
-            metalness: 0.1,
-            emissive: emissiveColor,
-            emissiveIntensity: 0,
-          }))
-      : textures
+      ? // Back cover: luôn dùng màu nền, không dùng texture
+        new MeshStandardMaterial({
+          color: backCoverColor || "#000000", // Màu nền cho back cover từ library, fallback là đen
+          roughness: 0.9,
+          metalness: 0.1,
+          emissive: emissiveColor,
+          emissiveIntensity: 0,
+        })
+      : textures && textures.back
       ? new MeshStandardMaterial({
           map: textures.back,
           emissive: emissiveColor,
@@ -305,7 +286,8 @@ const Page = ({
     back || '',
     Boolean(isCover),
     notebookFolder || '',
-    coverTexture || ''
+    coverTexture || '',
+    backCoverColor || ''
   ]);
 
   useEffect(() => {
@@ -599,15 +581,37 @@ export const Book = forwardRef(({ pages, ...props }, ref) => {
   const [bookIndex] = useAtom(currentBookAtom);
   const [delayedPage, setDelayedPage] = useState(page);
   
-  // Lấy notebookFolder và coverTexture từ BOOK_LIBRARY
-  const currentBook = BOOK_LIBRARY[bookIndex];
+  // Lấy notebookFolder, coverTexture và backCoverColor từ BOOK_LIBRARY
+  const currentBook = useMemo(() => BOOK_LIBRARY[bookIndex], [bookIndex]);
   const notebookFolder = currentBook?.notebookFolder || null;
   const coverTexture = currentBook?.coverTexture || null;
+  const backCoverColor = currentBook?.backCoverColor || null;
 
   // cover refs for collision
   const firstCoverRef = useRef(null);
   const lastCoverRef = useRef(null);
-  const coverRefs = { first: firstCoverRef, last: lastCoverRef };
+  const coverRefs = useMemo(() => ({ first: firstCoverRef, last: lastCoverRef }), []);
+
+  // Preload cover texture khi bookIndex thay đổi
+  useEffect(() => {
+    if (notebookFolder && coverTexture) {
+      const texturePath = `textures/${notebookFolder}/${coverTexture}`;
+      preloadTextureWithFallback(texturePath, { colorSpace: SRGBColorSpace });
+    }
+  }, [notebookFolder, coverTexture]);
+
+  // Preload textures của notebook tiếp theo trong background
+  useEffect(() => {
+    const nextBookIndex = (bookIndex + 1) % BOOK_LIBRARY.length;
+    const nextBook = BOOK_LIBRARY[nextBookIndex];
+    if (nextBook?.notebookFolder && nextBook?.coverTexture) {
+      const texturePath = `textures/${nextBook.notebookFolder}/${nextBook.coverTexture}`;
+      // Preload trong background với delay nhỏ để không block current loading
+      setTimeout(() => {
+        preloadTextureWithFallback(texturePath, { colorSpace: SRGBColorSpace });
+      }, 500);
+    }
+  }, [bookIndex]);
 
   useEffect(() => {
     // Chỉ preload texture cho các trang không phải cover
@@ -619,7 +623,6 @@ export const Book = forwardRef(({ pages, ...props }, ref) => {
           useTexture.preload(`textures/${p.back}.jpg`);
         } catch (e) {
           // Ignore texture load errors
-          console.warn(`Could not preload texture: ${p.front} or ${p.back}`);
         }
       }
     });
@@ -723,6 +726,7 @@ export const Book = forwardRef(({ pages, ...props }, ref) => {
           coverRefs={coverRefs}
           notebookFolder={notebookFolder}
           coverTexture={coverTexture}
+          backCoverColor={backCoverColor}
           {...pageData}
         />
       ))}

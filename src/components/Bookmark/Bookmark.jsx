@@ -5,7 +5,8 @@ import { useAtom } from "jotai";
 import { easing } from "maath";
 import { currentBookAtom, BOOK_LIBRARY } from "../../state/library";
 import { bookmarkFaceAtom } from "./UI";
-import { MeshStandardMaterial, SRGBColorSpace, TextureLoader, DoubleSide } from "three";
+import { MeshStandardMaterial, SRGBColorSpace, DoubleSide } from "three";
+import { loadTextureWithFallback, preloadTextureWithFallback } from "../../utils/textureCache";
 
 export const Bookmark = (props) => {
   const groupRef = useRef();
@@ -16,86 +17,72 @@ export const Bookmark = (props) => {
   const [isHovered, setIsHovered] = useState(false);
   const { gl } = useThree();
 
-  const current = BOOK_LIBRARY[bookIndex] || BOOK_LIBRARY[0];
-  const bookmark = current.bookmark || { front: "bookmark3", back: "bookmark2", folder: null };
+  const current = useMemo(() => BOOK_LIBRARY[bookIndex] || BOOK_LIBRARY[0], [bookIndex]);
+  const bookmark = useMemo(() => current.bookmark || { front: "bookmark3", back: "bookmark2", folder: null }, [current]);
   const { front, back, folder } = bookmark;
 
-  // Load textures sử dụng TextureLoader thay vì useTexture để tránh hooks issues
+  // Load textures sử dụng texture cache để tối ưu performance
   useEffect(() => {
-    const loader = new TextureLoader();
     let cancelled = false;
 
-    const loadTextures = () => {
+    const loadTextures = async () => {
       if (folder) {
-        // Thử load PNG từ folder trước (file thực tế là PNG)
-        loader.load(
-          `textures/${folder}/${front}.png`,
-          (texture) => {
-            if (cancelled) return;
-            texture.colorSpace = SRGBColorSpace;
-            texture.flipY = true; // Flip Y để hiển thị đúng orientation
-            setTextures(prev => ({ ...prev, front: texture }));
-          },
-          undefined,
-          () => {
-            // PNG failed, try JPG
-            if (cancelled) return;
-            loader.load(
-              `textures/${folder}/${front}.jpg`,
-              (texture) => {
-                if (cancelled) return;
-                texture.colorSpace = SRGBColorSpace;
-                texture.flipY = true; // Flip Y để hiển thị đúng orientation
-                setTextures(prev => ({ ...prev, front: texture }));
-              }
-            );
-          }
-        );
+        // Load từ folder với cache và fallback
+        const frontPath = `textures/${folder}/${front}`;
+        const backPath = `textures/${folder}/${back}`;
 
-        loader.load(
-          `textures/${folder}/${back}.png`,
-          (texture) => {
-            if (cancelled) return;
-            texture.colorSpace = SRGBColorSpace;
-            texture.flipY = true; // Flip Y để hiển thị đúng orientation
-            setTextures(prev => ({ ...prev, back: texture }));
-          },
-          undefined,
-          () => {
-            // PNG failed, try JPG
-            if (cancelled) return;
-            loader.load(
-              `textures/${folder}/${back}.jpg`,
-              (texture) => {
-                if (cancelled) return;
-                texture.colorSpace = SRGBColorSpace;
-                texture.flipY = true; // Flip Y để hiển thị đúng orientation
-                setTextures(prev => ({ ...prev, back: texture }));
-              }
-            );
+        try {
+          const frontTexture = await loadTextureWithFallback(frontPath, {
+            colorSpace: SRGBColorSpace,
+            flipY: true
+          });
+          if (!cancelled) {
+            setTextures(prev => ({ ...prev, front: frontTexture }));
           }
-        );
+        } catch (error) {
+          if (!cancelled) {
+            console.warn(`Failed to load bookmark front texture: ${frontPath}`);
+          }
+        }
+
+        try {
+          const backTexture = await loadTextureWithFallback(backPath, {
+            colorSpace: SRGBColorSpace,
+            flipY: true
+          });
+          if (!cancelled) {
+            setTextures(prev => ({ ...prev, back: backTexture }));
+          }
+        } catch (error) {
+          if (!cancelled) {
+            console.warn(`Failed to load bookmark back texture: ${backPath}`);
+          }
+        }
       } else {
-        // Load từ root
-        loader.load(
-          `textures/${front}.jpg`,
-          (texture) => {
-            if (cancelled) return;
-            texture.colorSpace = SRGBColorSpace;
-            texture.flipY = true; // Flip Y để hiển thị đúng orientation
-            setTextures(prev => ({ ...prev, front: texture }));
+        // Load từ root (fallback)
+        try {
+          const frontTexture = await loadTextureWithFallback(`textures/${front}`, {
+            colorSpace: SRGBColorSpace,
+            flipY: true
+          });
+          if (!cancelled) {
+            setTextures(prev => ({ ...prev, front: frontTexture }));
           }
-        );
+        } catch (error) {
+          // Ignore
+        }
 
-        loader.load(
-          `textures/${back}.jpg`,
-          (texture) => {
-            if (cancelled) return;
-            texture.colorSpace = SRGBColorSpace;
-            texture.flipY = true; // Flip Y để hiển thị đúng orientation
-            setTextures(prev => ({ ...prev, back: texture }));
+        try {
+          const backTexture = await loadTextureWithFallback(`textures/${back}`, {
+            colorSpace: SRGBColorSpace,
+            flipY: true
+          });
+          if (!cancelled) {
+            setTextures(prev => ({ ...prev, back: backTexture }));
           }
-        );
+        } catch (error) {
+          // Ignore
+        }
       }
     };
 
@@ -103,9 +90,34 @@ export const Bookmark = (props) => {
 
     return () => {
       cancelled = true;
-      setTextures({ front: null, back: null });
+      // Không reset textures để giữ cache
     };
   }, [front, back, folder]);
+
+  // Preload bookmark textures của notebook tiếp theo
+  useEffect(() => {
+    const nextBookIndex = (bookIndex + 1) % BOOK_LIBRARY.length;
+    const nextBook = BOOK_LIBRARY[nextBookIndex];
+    const nextBookmark = nextBook?.bookmark;
+    
+    if (nextBookmark?.folder) {
+      // Preload trong background với delay
+      setTimeout(() => {
+        if (nextBookmark.front) {
+          preloadTextureWithFallback(`textures/${nextBookmark.folder}/${nextBookmark.front}`, {
+            colorSpace: SRGBColorSpace,
+            flipY: true
+          });
+        }
+        if (nextBookmark.back) {
+          preloadTextureWithFallback(`textures/${nextBookmark.folder}/${nextBookmark.back}`, {
+            colorSpace: SRGBColorSpace,
+            flipY: true
+          });
+        }
+      }, 500);
+    }
+  }, [bookIndex]);
 
   // Animation để lật bookmark giữa front và back
   useFrame((_, delta) => {
