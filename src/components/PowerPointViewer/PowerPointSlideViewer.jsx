@@ -89,7 +89,7 @@ export const PowerPointSlideViewer = () => {
                   : "bg-gray-700/50 text-gray-300 group-hover:bg-gray-600/50"
               }`}>
                 <span className="text-[10px] font-extrabold tracking-wider">
-                  {String(index + 1).padStart(2, '0')}
+                  {String(index + 1).padStart(2, "0")}
                 </span>
               </div>
               
@@ -124,24 +124,21 @@ export const PowerPointSlideViewer = () => {
             exit={{ opacity: 0, scale: 0.95, x: -50 }}
             transition={{ 
               duration: 0.5,
-              ease: [0.4, 0, 0.2, 1] // Custom easing for smooth transition
+              ease: [0.4, 0, 0.2, 1]
             }}
             className="w-full h-full flex items-center justify-center p-2"
           >
-            {/* Slide Content - White slide area like PowerPoint - Expanded */}
             <div className="relative w-full h-full bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col">
-              {/* Slide Title Bar - Compact */}
               <div className="relative bg-gradient-to-r from-blue-600 to-blue-700 flex items-center justify-between px-6 py-3 z-10">
                 <div className="text-white">
-                  <h2 className="text-lg font-bold">{currentBook?.title || 'Untitled'}</h2>
-                  <p className="text-xs text-blue-100">{currentBook?.story?.title || ''}</p>
+                  <h2 className="text-lg font-bold">{currentBook?.title || "Untitled"}</h2>
+                  <p className="text-xs text-blue-100">{currentBook?.story?.title || ""}</p>
                 </div>
                 <div className="text-white text-sm font-medium">
                   Slide {currentSlide + 1} / {totalSlides}
                 </div>
               </div>
 
-              {/* 3D Book Canvas - Expanded to show both notebook and bookmark */}
               <div className="relative flex-1 w-full flex items-center justify-center">
                 <Canvas
                   shadows
@@ -160,7 +157,6 @@ export const PowerPointSlideViewer = () => {
                 </Canvas>
                 <Loader />
                 
-                {/* Bookmark Controls - Overlay trên canvas */}
                 <div className="absolute bottom-8 right-8 flex flex-col gap-3 z-30">
                   <button
                     onClick={() => setBookmarkFace(bookmarkFace === 0 ? 1 : 0)}
@@ -169,7 +165,7 @@ export const PowerPointSlideViewer = () => {
                   >
                     <RotateCcw size={20} />
                     <span className="text-sm font-medium">
-                      {bookmarkFace === 0 ? 'Front' : 'Back'}
+                      {bookmarkFace === 0 ? "Front" : "Back"}
                     </span>
                   </button>
                   <div className="bg-white/90 px-3 py-2 rounded-lg shadow-lg text-xs text-gray-600 text-center">
@@ -182,7 +178,6 @@ export const PowerPointSlideViewer = () => {
           </motion.div>
         </AnimatePresence>
 
-        {/* Navigation Buttons - Improved styling */}
         <button
           onClick={goToPrevious}
           disabled={currentSlide === 0}
@@ -201,7 +196,6 @@ export const PowerPointSlideViewer = () => {
           <ChevronRight size={28} />
         </button>
 
-        {/* Slide Indicator Dots - Improved styling */}
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex gap-3 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg">
           {BOOK_LIBRARY.map((_, index) => (
             <button
@@ -218,7 +212,6 @@ export const PowerPointSlideViewer = () => {
         </div>
       </div>
       
-      {/* Footer */}
       <PowerPointFooter />
     </div>
   );

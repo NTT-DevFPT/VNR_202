@@ -139,7 +139,7 @@ export const BOOK_LIBRARY = [
     title: "Phong trào Duy Tân",
     notebookFolder: "notebook5",
     coverTexture: "PT_DuyTan_Cover",
-    backCoverColor: "#1E3A5B", // Màu vàng nâu ấm (cải cách, đổi mới)
+    backCoverColor: "rgba(255,236,127,0.87)", // Màu vàng nâu ấm (cải cách, đổi mới)
     bookmarkFront: "PT_DuyTan_BM_Front",
     bookmarkBack: "PT_DuyTan_BM_Back",
     pages: buildNotebookPages({
