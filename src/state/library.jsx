@@ -186,7 +186,7 @@ export const BOOK_LIBRARY = [
   },
   {
     id: "notebook-07",
-    title: "Khởi nghĩa Bãi Sậy",
+    title: " Phong trào \"Vô sản hóa\" (1928-1929)",
     notebookFolder: "notebook7",
     coverTexture: "PT_VoSanHoa_Cover",
     backCoverColor: "#df1b1b", // Màu xanh lá đậm (đồng bằng, lau sậy)
@@ -211,7 +211,7 @@ export const BOOK_LIBRARY = [
   },
   {
     id: "notebook-08",
-    title: "Khởi nghĩa Thái Nguyên",
+    title: "Khởi nghĩa Thái Nguyên(1917)",
     notebookFolder: "notebook8",
     coverTexture: "KN_ThaiNguyen_Cover",
     backCoverColor: "#df2020", // Màu nâu vàng đậm (rừng núi, khởi nghĩa)
@@ -236,7 +236,7 @@ export const BOOK_LIBRARY = [
   },
   {
     id: "notebook-09",
-    title: "Phan Châu Trinh",
+    title: "Phong trào để tang Phan Châu Trinh (1926)",
     notebookFolder: "notebook9",
     coverTexture: "PhanChauTrinh_Cover",
     backCoverColor: "#FFFFFF", // Màu nâu xám (văn học, trí thức)
@@ -261,10 +261,10 @@ export const BOOK_LIBRARY = [
   },
   {
     id: "notebook-10",
-    title: "Phong trào Án Xá Phan Bội Châu",
+    title: "Phong trào đòi ân xá cho Phan Bội Châu (1925)",
     notebookFolder: "notebook10",
     coverTexture: "PT_AnXaPBC_Cover",
-    backCoverColor: "#e8cb88", // Màu xanh dương xám (tự do, cách mạng)
+    backCoverColor: "#f6f3ee", // Màu xanh dương xám (tự do, cách mạng)
     bookmarkFront: "PT_AnXaPBC_BM_front", // Chú ý: file thực tế là "front" (chữ thường)
     bookmarkBack: "PT_AnXaPBC_BM_Back",
     pages: buildNotebookPages({
