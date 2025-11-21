@@ -6,6 +6,7 @@
   <img src="https://img.shields.io/badge/Library-jQuery-0769AD?style=for-the-badge&logo=jquery" alt="jQuery">
   <img src="https://img.shields.io/badge/Charts-Chart.js-FF6384?style=for-the-badge&logo=chartdotjs" alt="Chart.js">
   <img src="https://img.shields.io/badge/3D-Three.js-000000?style=for-the-badge&logo=threedotjs" alt="Three.js">
+    <img src="https://github.com/NTT-DevFPT/VNR_202/actions/workflows/ci.yml/badge.svg" alt="CI">
 </div>
 
 <div align="center">
